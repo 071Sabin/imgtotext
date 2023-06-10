@@ -50,22 +50,33 @@ router.post('/converted', upload.array('files'), function(req, res, next) {
 
   else{
     // return res.render('index', { title: 'Image To Text', errorMessage: null});
+
+    const inpvalue = req.body.language;
+    if(inpvalue === '1'){
+      lng='nep';
+    }
+    if(inpvalue == '2'){
+      lng='eng';
+    }
+    
     req.files.forEach((file)=>{
       const imagePath = file.path;
-      console.log(imagePath);
       Tesseract.recognize(imagePath, {
-        lang: 'nep',
+        lang: lng,
         oem: 1,
         psm: 3,
       })
-        .then((text)=>{
-          const textFilePath =imagePath + '.txt';
-          fs.writeFileSync(textFilePath, text);
-        });
-      })
-      .catch((err)=>{
-        console.log("something errors");
+      .then((text)=>{
+        // console.log(text);
+        const textFilePath = imagePath + '.txt';
+        fs.writeFileSync(textFilePath, text);
       });
+    })
+    res.redirect('/');
+
+    // .catch((err)=>{
+    //   console.log("something errors");
+    // });
   }
 });
 
