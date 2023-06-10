@@ -4,13 +4,22 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const Tesseract = require('node-tesseract-ocr');
+const { v4: uuidv4 } = require('uuid');
+
 
 
 
 // Define the storage configuration for multer
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, './public/uploads/'); // Specify the destination folder where images should be stored
+    const userId = uuidv4();
+    const folderName = `./public/uploads/${userId}`;
+    const imgFolder = path.join(folderName, 'images');
+    const textFolder = path.join(folderName, 'texts');
+    fs.mkdirSync(folderName);
+    fs.mkdirSync(imgFolder);
+    fs.mkdirSync(textFolder);
+    cb(null, imgFolder); // Specify the destination folder where images should be stored
   },
   
   filename: function (req, file, cb) {
@@ -39,7 +48,7 @@ const upload = multer({ storage: storage, fileFilter: fileFilter});
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Image To Text', errorMessage: null});
+  res.render('index', { title: 'Image To Text', errorMessage: null, text: null});
 });
 
 router.post('/converted', upload.array('files'), function(req, res, next) {
@@ -66,6 +75,7 @@ router.post('/converted', upload.array('files'), function(req, res, next) {
         oem: 1,
         psm: 3,
       })
+
       .then((text)=>{
         // console.log(text);
         const textFilePath = imagePath + '.txt';
