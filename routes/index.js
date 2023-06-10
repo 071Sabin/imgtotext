@@ -2,6 +2,10 @@ var express = require('express');
 var router = express.Router();
 const multer = require('multer');
 const path = require('path');
+const fs = require('fs');
+const Tesseract = require('node-tesseract-ocr');
+
+
 
 // Define the storage configuration for multer
 const storage = multer.diskStorage({
@@ -17,26 +21,53 @@ const storage = multer.diskStorage({
 
 
 const fileFilter = (req, file, cb) => {
+
   // Check if the file type is an image
   if (file.mimetype.startsWith('image/')) {
     cb(null, true); // Accept the file
-  } else {
-    cb(new Error("manual: you are not uploading image")); // Reject the file
+  } 
+  // Reject the file with error message
+  else {
+    req.fileValidationError = "Oops, please upload image files only !!";
+    cb(null, false); 
   }
 };
+
 
 // Configure multer with the storage settings
 const upload = multer({ storage: storage, fileFilter: fileFilter});
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Image To Text', fileFilter: fileFilter});
+  res.render('index', { title: 'Image To Text', errorMessage: null});
 });
 
 router.post('/converted', upload.array('files'), function(req, res, next) {
-  res.redirect('/');
-});
 
+  if (req.fileValidationError) {
+    return res.render('index', { title: 'Image To Text', errorMessage: req.fileValidationError});
+  }
+
+  else{
+    // return res.render('index', { title: 'Image To Text', errorMessage: null});
+    req.files.forEach((file)=>{
+      const imagePath = file.path;
+      console.log(imagePath);
+      Tesseract.recognize(imagePath, {
+        lang: 'nep',
+        oem: 1,
+        psm: 3,
+      })
+        .then((text)=>{
+          const textFilePath =imagePath + '.txt';
+          fs.writeFileSync(textFilePath, text);
+        });
+      })
+      .catch((err)=>{
+        console.log("something errors");
+      });
+  }
+});
 
 
 module.exports = router;
