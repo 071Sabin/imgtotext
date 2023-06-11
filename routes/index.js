@@ -15,10 +15,10 @@ const storage = multer.diskStorage({
     const userId = uuidv4();
     const folderName = `./public/uploads/${userId}`;
     const imgFolder = path.join(folderName, 'images');
-    const textFolder = path.join(folderName, 'texts');
+    // const textFolder = path.join(folderName, 'texts');
     fs.mkdirSync(folderName);
     fs.mkdirSync(imgFolder);
-    fs.mkdirSync(textFolder);
+    // fs.mkdirSync(textFolder);
     cb(null, imgFolder); // Specify the destination folder where images should be stored
   },
   
@@ -70,6 +70,7 @@ router.post('/converted', upload.array('files'), function(req, res, next) {
     
     req.files.forEach((file)=>{
       const imagePath = file.path;
+      console.log(imagePath);
       Tesseract.recognize(imagePath, {
         lang: lng,
         oem: 1,
@@ -78,7 +79,15 @@ router.post('/converted', upload.array('files'), function(req, res, next) {
 
       .then((text)=>{
         // console.log(text);
-        const textFilePath = imagePath + '.txt';
+
+        const textFolder = path.join(path.dirname(file.destination), 'texts');
+        fs.mkdirSync(textFolder);
+
+        // seperating file name and extension.
+        // const textFilePath1=(path.basename(imagePath).slice(0, -path.extname(imagePath).length));
+
+        // creating a textfile with filename + .txt, the .jpg is removed above.
+        const textFilePath = path.join(textFolder, `${path.basename(imagePath, path.extname(file.originalname))}.txt`);
         fs.writeFileSync(textFilePath, text);
       });
     })
