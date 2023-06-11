@@ -2,23 +2,45 @@ var express = require('express');
 var router = express.Router();
 const multer = require('multer');
 const path = require('path');
+const cookieParser = require('cookie-parser');
 const fs = require('fs');
 const Tesseract = require('node-tesseract-ocr');
-const { v4: uuidv4 } = require('uuid');
+// const { v4: uuidv4 } = require('uuid'); //used to create random texts of 32 places.
+
+const app=express();
+app.use(cookieParser());
 
 
+function generateUserId(){
+  const userRandomId = Math.random().toString(36).substr(2, 9);
+  return`user_${userRandomId}`;
+}
 
+// Middleware to check if user ID cookie is set, and if not, generate a new one
+app.use((req, res, next) => {
+  if (!req.cookies.userId) {
+    const userId = generateUserId();
+    const coki=res.cookie('userId', userId, { maxAge: 30 * 24 * 60 * 60 * 1000 }, { httpOnly: true, sameSite: 'strict' }); // Expires in 30 days
+    console.log(coki);
+  }
+  next();
+});
 
 // Define the storage configuration for multer
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    const userId = uuidv4();
+    const userId = generateUserId();
+
+    // creating a unique folder for every users.
     const folderName = `./public/uploads/${userId}`;
     const imgFolder = path.join(folderName, 'images');
-    // const textFolder = path.join(folderName, 'texts');
-    fs.mkdirSync(folderName);
-    fs.mkdirSync(imgFolder);
-    // fs.mkdirSync(textFolder);
+
+    if(!fs.existsSync(folderName)){
+      fs.mkdirSync(folderName);
+    }
+    if(!fs.existsSync(imgFolder)){
+      fs.mkdirSync(imgFolder);
+    }
     cb(null, imgFolder); // Specify the destination folder where images should be stored
   },
   
@@ -70,7 +92,6 @@ router.post('/converted', upload.array('files'), function(req, res, next) {
     
     req.files.forEach((file)=>{
       const imagePath = file.path;
-      console.log(imagePath);
       Tesseract.recognize(imagePath, {
         lang: lng,
         oem: 1,
@@ -83,11 +104,13 @@ router.post('/converted', upload.array('files'), function(req, res, next) {
         const textFolder = path.join(path.dirname(file.destination), 'texts');
         fs.mkdirSync(textFolder);
 
-        // seperating file name and extension.
+        // 1. seperating file name and extension. And removing the extension .jpg at last or whatever the extensions is.
+        //    basically extracting name of the file.
+        
         // const textFilePath1=(path.basename(imagePath).slice(0, -path.extname(imagePath).length));
 
-        // creating a textfile with filename + .txt, the .jpg is removed above.
-        const textFilePath = path.join(textFolder, `${path.basename(imagePath, path.extname(file.originalname))}.txt`);
+        // file.originalname represents the filename as the user uploaded.
+        const textFilePath = path.join(textFolder, `${path.basename(file.originalname, path.extname(file.originalname))}.txt`);
         fs.writeFileSync(textFilePath, text);
       });
     })
