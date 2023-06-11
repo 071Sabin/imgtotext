@@ -11,26 +11,31 @@ const app=express();
 app.use(cookieParser());
 
 
-function generateUserId(){
+const generateUserId = function(req, res, next){
   const userRandomId = Math.random().toString(36).substr(2, 9);
+  res.cookie('userId', generateUserId(), { maxAge: 30 * 24 * 60 * 60 * 1000 }, { httpOnly: true, sameSite: 'strict' });
   return`user_${userRandomId}`;
 }
 
+
 // Middleware to check if user ID cookie is set, and if not, generate a new one
-app.use((req, res, next) => {
-  if (!req.cookies.userId) {
-    const userId = generateUserId();
-    res.cookie('userId', userId, { maxAge: 30 * 24 * 60 * 60 * 1000 }, { httpOnly: true, sameSite: 'strict' }); // Expires in 30 days:: { httpOnly: true, sameSite: 'strict' }
-  }
-  next();
-});
+// app.use((req, res, next) => {
+//   if (!req.cookies.userId) {
+//     const userId = generateUserId();
+//     console.log("cookie userid: " + userId);
+//     res.cookie('userId', userId, { maxAge: 30 * 24 * 60 * 60 * 1000 }, { httpOnly: true, sameSite: 'strict' }); // Expires in 30 days:: { httpOnly: true, sameSite: 'strict' }
+//   }else{
+//     console.log("user id in cookie is already SET!!!!!!!!");
+//   }
+//   next();
+// });
 
 // Define the storage configuration for multer
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     const userId = req.cookies.userId;
-    console.log(userId);
-
+    // console.log("|||user id from cookie is===> ", userId);
+    
     // creating a unique folder for every users.
     const folderName = `./public/uploads/${userId}`;
     const imgFolder = path.join(folderName, 'images');
@@ -73,6 +78,7 @@ router.get('/', function(req, res, next) {
   res.render('index', { title: 'Image To Text', errorMessage: null});
 });
 
+// write upload.array('input field name', maxcount)
 router.post('/converted', upload.array('files'), function(req, res, next) {
 
   if (req.fileValidationError) {
@@ -81,7 +87,7 @@ router.post('/converted', upload.array('files'), function(req, res, next) {
 
   else{
     // return res.render('index', { title: 'Image To Text', errorMessage: null});
-
+    // res.cookie('userId', generateUserId(), { maxAge: 30 * 24 * 60 * 60 * 1000 }, { httpOnly: true, sameSite: 'strict' });
     const inpvalue = req.body.language;
     let lng = "";
     if(inpvalue === '1'){
@@ -120,6 +126,7 @@ router.post('/converted', upload.array('files'), function(req, res, next) {
     res.redirect('/');
   }
 });
+
 
 
 module.exports = router;
