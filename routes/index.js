@@ -20,8 +20,7 @@ function generateUserId(){
 app.use((req, res, next) => {
   if (!req.cookies.userId) {
     const userId = generateUserId();
-    const coki=res.cookie('userId', userId, { maxAge: 30 * 24 * 60 * 60 * 1000 }, { httpOnly: true, sameSite: 'strict' }); // Expires in 30 days
-    console.log(coki);
+    res.cookie('userId', userId, { maxAge: 30 * 24 * 60 * 60 * 1000 }, { httpOnly: true, sameSite: 'strict' }); // Expires in 30 days:: { httpOnly: true, sameSite: 'strict' }
   }
   next();
 });
@@ -29,7 +28,8 @@ app.use((req, res, next) => {
 // Define the storage configuration for multer
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    const userId = generateUserId();
+    const userId = req.cookies.userId;
+    console.log(userId);
 
     // creating a unique folder for every users.
     const folderName = `./public/uploads/${userId}`;
@@ -70,7 +70,7 @@ const upload = multer({ storage: storage, fileFilter: fileFilter});
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Image To Text', errorMessage: null, text: null});
+  res.render('index', { title: 'Image To Text', errorMessage: null});
 });
 
 router.post('/converted', upload.array('files'), function(req, res, next) {
@@ -83,6 +83,7 @@ router.post('/converted', upload.array('files'), function(req, res, next) {
     // return res.render('index', { title: 'Image To Text', errorMessage: null});
 
     const inpvalue = req.body.language;
+    let lng = "";
     if(inpvalue === '1'){
       lng='nep';
     }
@@ -102,23 +103,21 @@ router.post('/converted', upload.array('files'), function(req, res, next) {
         // console.log(text);
 
         const textFolder = path.join(path.dirname(file.destination), 'texts');
-        fs.mkdirSync(textFolder);
+        if(!fs.existsSync(textFolder)){
+          fs.mkdirSync(textFolder);
+        }
 
         // 1. seperating file name and extension. And removing the extension .jpg at last or whatever the extensions is.
         //    basically extracting name of the file.
         
         // const textFilePath1=(path.basename(imagePath).slice(0, -path.extname(imagePath).length));
 
-        // file.originalname represents the filename as the user uploaded.
+        // file.originalname represents the filename as the user uploaded. we're removing extension and just getting basename from imagename.jpg
         const textFilePath = path.join(textFolder, `${path.basename(file.originalname, path.extname(file.originalname))}.txt`);
         fs.writeFileSync(textFilePath, text);
       });
     })
     res.redirect('/');
-
-    // .catch((err)=>{
-    //   console.log("something errors");
-    // });
   }
 });
 
