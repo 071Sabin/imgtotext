@@ -18,7 +18,7 @@ function generateUserId(res){
 
 // Middleware to check if user ID cookie is set, and if not, generate a new one
 app.use((req, res, next) => {
-  if (req.cookies.userName === undefined) {
+  if (!req.cookies.userName) {
     const userId = generateUserId();
     res.cookie('userName', userId, { maxAge: 30 * 24 * 60 * 60 * 1000 }, { httpOnly: true, sameSite: 'strict' }); // Expires in 30 days:: { httpOnly: true, sameSite: 'strict' }
   }
@@ -30,7 +30,7 @@ app.use((req, res, next) => {
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     const userId = req.cookies.userName;
-    console.log("*******user name from cookie is===> ", userId);
+    // console.log("*******user name from cookie is===> ", userId);
 
     // creating a unique folder for every users.
     const folderName = `./public/uploads/${userId}`;
