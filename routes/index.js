@@ -60,7 +60,7 @@ const fileFilter = (req, file, cb) => {
   } 
   // Reject the file with error message
   else {
-    req.fileValidationError = "Oops, please upload image files only !!";
+    req.fileValidationError = "Oops, you didn't upload an image file :('";
     cb(null, false); 
   }
 };
@@ -101,7 +101,6 @@ app.post('/converted', upload.array('files'), function(req, res, next) {
 
       .then((text)=>{
         // console.log(text);
-
         const textFolder = path.join(path.dirname(file.destination), 'texts');
         if(!fs.existsSync(textFolder)){
           fs.mkdirSync(textFolder);

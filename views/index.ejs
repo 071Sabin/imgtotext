@@ -17,61 +17,44 @@
       </h1>
 
       <main class="m-8">
-          <div class="text-lg">
-              <!-- <p class="font-bold text-center mt-0">Converts only those images which has text in it.</p> -->
-              <hr>
-              <ol class="list-decimal">
-                  <li>Convert your pdf to images from this site <a href="https://www.ilovepdf.com/pdf_to_jpg" target="_blank" class="text-green-500">pdf to Image.</a></li>
-                  <li>Extract the zip file downloaded.</li>
-                  <li><strong>Ctrl+A</strong> to select all the image file to select all.</li>
-                  <li>Right click and click rename.</li>
-                  <li>Give any name to the file, it will create file name with the unique index on every file. For example: You gave "hello" it will create "hello (1)" itself.</li>
-                  <li>You have 10 files then, it will be created as "hello (1)" ...........up to "hello (10)".</li>
-                  <li>Click the <strong> browse/choose files</strong> button below.</li>
-                  <li>The file name you gave above, enter the same filename below. for example: You gave filename "hello" then just enter "hello". Do not enter "hello (1)"</li>
-              </ol>
-          </div>
+            <div class="text-lg pl-5 pr-5">
+                <p class="font-bold text-center mt-0">Converts only those images which has text in it.</p>
+                <hr>
+                <ol class="list-decimal">
+                    <li>Convert your pdf to images from this site <a href="https://www.ilovepdf.com/pdf_to_jpg" target="_blank" class="text-green-500">pdf to Image</a> and download zip file.</li>
+                    <li>Extract the zip file downloaded.</li>
+                    <li><strong>Ctrl+A</strong> to select all the image files.</li>
+                    <li>Right click on any file(<em>as all files are selected</em>) and select <strong>rename</strong>.</li>
+                    <li>Give any name to the file, it will create file name with the unique index on every file. As an example: You gave "hello" it will create "hello (1)" itself.</li>
+                    <li>You have 10 files then, it will be named as "hello (1)" ...........up to "hello (10)".</li>
+                    <li>Click the <strong> browse/choose files</strong> button below.</li>
+                    <li>The file name you gave above, enter the same filename below. for example: You gave filename "hello" then just enter "hello". Do not enter "hello (1)"</li>
+                </ol>
+            </div>
 
-          <div class="height-100 border-dashed border-2 border-black-900 mt-10 p-5">
-              <p class="text-3xl font-bold mb-4">Upload Images Here</p>
+            <div class="height-100 border-dashed border-2 border-black-900 mt-10 p-5">
 
-              <!-- enctype="multipart/form-data" -->
-              <form id="form" class="w-fit" action="/converted" autocomplete="off" method="POST" enctype="multipart/form-data">
-                
-                  <!-- <input type="text" name="filename" id="fileName" placeholder="Enter filename initial only" class="bg-slate-600 rounded-2xl w-full mb-4 px-2 py-2 text-white" required><br> -->
-                  
-                    <p class="pb-2">Choose the language that is in your image.</p>
-                    <select name="language" id="lng" class="text-white mb-4 p-2 w-full rounded-lg bg-gray-600 text-center" required>
+                <form id="form" class="w-fit" action="/converted" autocomplete="off" method="POST" enctype="multipart/form-data">  
+                    <p class="text-3xl font-bold mb-4">Upload Images Here</p>                  
+                    <p class="pb-2">1. Select the language that appears in your picture.</p>
+                    <select name="language" id="lng" class="text-white mb-4 p-2 rounded-lg bg-gray-600 text-center w-full" required>
                         <option value="" disabled selected hidden>-- Choose Language --</option>
                         <option value="1">Nepali</option>
                         <option value="2">English</option>
                     </select>
                     <br>
                     
-                    
                     <% if (errorMessage) {%>
                         <p id="error1" class="bg-red-300 text-red-800 px-1 py-2 mb-4 rounded-sm" role="alert"><%= errorMessage %></p> 
-                    <%}%>            
-                    
-                    <input type="file" name="files" id="fileInput" class="mb-4 border-solid border-2 border-black-600 px-2 py-4 rounded-lg file:rounded-xl file:border-0 file:bg-green-500 file:py-1 file:px-2 file:text-white" multiple required><br>
-                    <button id="submitBtn" action="#" class="bg-green-500 text-white px-5 py-2 rounded-lg hover:bg-white hover:text-green-600 hover:border-solid hover:border-2 hover:border-green-600 cursor-pointer"><a>SUBMIT</a></button><br>
-              </form>
+                    <%}%>
 
-              <!-- <div class="" autocomplete="off" method="GET">
-                  <input type="text" name="filename" id="filename" placeholder="Enter filename initial only" class="bg-slate-600 rounded-2xl w-full mb-4 px-2 py-2 text-white" required><br>
-                  
-                  <p class="pb-2">Choose the language that is in your image.</p>
-                  <select name="language" id="lng" class="text-white mb-4 p-2 w-full rounded-lg bg-gray-600 text-center" required>
-                      <option value="" disabled selected hidden>--Choose Language--</option>
-                      <option value="nepali">Nepali</option>
-                      <option value="english">English</option>
-                  </select>
-                  <br>
-                  
-                  <input type="file" name="files[]" id="file" class="mb-4 border-solid border-2 border-black-600 px-2 py-4 rounded-lg file:rounded-xl file:border-0 file:bg-green-500 file:py-1 file:px-2 file:text-white" multiple required><br>
-                  <button id="submitBtn" action="#" class="bg-green-500 text-white px-5 py-2 rounded-lg hover:bg-white hover:text-green-600 hover:border-solid hover:border-2 hover:border-green-600 cursor-pointer">SUBMIT</button>
-              </div> -->
-          </div>    
+                    <p class="">2. Insert one or more picture files.</p>
+                    <input type="file" name="files" id="fileInput" class="mb-4 w-full border-solid border-2 border-black-600 px-2 py-4 rounded-lg file:rounded-sm file:border-0 file:bg-green-500 file:py-2 file:px-3 file:text-white" multiple required><br>
+                    <button id="submitBtn" action="#" class="bg-green-500 text-white px-5 py-2 rounded-lg hover:bg-white hover:text-green-600 hover:border-solid hover:border-2 hover:border-green-600 cursor-pointer"><a>SUBMIT</a></button><br>
+                </form>
+
+                <div class="w-fit">here will be download button</div>
+            </div>    
       </main>
   </body>
 <!-- <script src="https://cdn.tailwindcss.com"></script> -->
