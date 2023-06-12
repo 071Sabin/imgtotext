@@ -65,7 +65,6 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-
 // Configure multer with the storage settings
 const upload = multer({ storage: storage, fileFilter: fileFilter});
 
@@ -93,6 +92,7 @@ app.post('/converted', upload.array('files'), function(req, res, next) {
     
     req.files.forEach((file)=>{
       const imagePath = file.path;
+      // console.log(path.dirname(imagePath));
       Tesseract.recognize(imagePath, {
         lang: lng,
         oem: 1,
@@ -101,7 +101,7 @@ app.post('/converted', upload.array('files'), function(req, res, next) {
 
       .then((text)=>{
         // console.log(text);
-        const textFolder = path.join(path.dirname(file.destination), 'texts');
+        var textFolder = path.join(path.dirname(file.destination), 'texts');
         if(!fs.existsSync(textFolder)){
           fs.mkdirSync(textFolder);
         }
@@ -114,7 +114,13 @@ app.post('/converted', upload.array('files'), function(req, res, next) {
         // file.originalname represents the filename as the user uploaded. we're removing extension and just getting basename from imagename.jpg
         const textFilePath = path.join(textFolder, `${path.basename(file.originalname, path.extname(file.originalname))}.txt`);
         fs.writeFileSync(textFilePath, text);
+
+        // deletes all the images after converted to texts at once, so it's just 'unlink' else it would me unlinkSync.
+        // promises checks if all the file related tasks are completed. it promises that after the file related tasks are completed then it will unlink the image files.
+        fs.promises.unlink(imagePath);
       });
+      // fs.unlinkSync(path.dirname(imagePath));
+      // fs.rmdirSync(path.dirname(imagePath));
     })
     res.redirect('/');
   }
