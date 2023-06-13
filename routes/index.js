@@ -7,6 +7,8 @@ const fs = require('fs');
 const Tesseract = require('node-tesseract-ocr');
 const bcrypt = require('bcrypt'); //encyypt and decrypt
 // const { v4: uuidv4 } = require('uuid'); //used to create random texts of 32 places.
+const jszip = require('jszip');
+
 
 const app=express();
 app.use(cookieParser());
@@ -122,6 +124,7 @@ app.post('/converted', upload.array('files'), function(req, res, next) {
       // fs.unlinkSync(path.dirname(imagePath));
       // fs.rmdirSync(path.dirname(imagePath));
     })
+    
     res.redirect('/');
   }
 });
