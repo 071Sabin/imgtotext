@@ -1,6 +1,6 @@
 {
    "version": 2,
-   "name": "Image2Text",
+   "name": "image2text",
    "builds": [
       { "src": "app.js", "use": "@vercel/node" }
    ],
