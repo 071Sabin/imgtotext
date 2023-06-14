@@ -36,7 +36,7 @@ const storage = multer.diskStorage({
     // console.log("*******user name from cookie is===> ", userId);
 
     // creating a unique folder for every users.
-    const folderName = `./public/uploads/${userId}`;
+    const folderName = `public/uploads/${userId}`;
     const imgFolder = path.join(folderName, 'images');
 
     if(!fs.existsSync(folderName)){
