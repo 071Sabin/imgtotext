@@ -1,1 +1,0 @@
-const btn1 = document.getElementById('submitBtn');

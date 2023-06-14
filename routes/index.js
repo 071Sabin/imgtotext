@@ -7,7 +7,8 @@ const fs = require('fs');
 const Tesseract = require('node-tesseract-ocr');
 const bcrypt = require('bcrypt'); //encyypt and decrypt
 // const { v4: uuidv4 } = require('uuid'); //used to create random texts of 32 places.
-const jszip = require('jszip');
+const jsZip = require('jszip');
+const { create } = require('domain');
 
 
 const app=express();
@@ -31,7 +32,7 @@ app.use((req, res, next) => {
 // each file upload goes through this process.
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    const userId = req.cookies.userName;
+    var userId = req.cookies.userName;
     // console.log("*******user name from cookie is===> ", userId);
 
     // creating a unique folder for every users.
@@ -84,6 +85,10 @@ app.post('/converted', upload.array('files'), function(req, res, next) {
 
   else{
     const inpvalue = req.body.language;
+    const zip1 = new jsZip();
+    const userId = req.cookies.userName;
+    zipFolderPath = `${userId}/texts`;
+
     let lng = "";
     if(inpvalue === '1'){
       lng='nep';
@@ -91,11 +96,10 @@ app.post('/converted', upload.array('files'), function(req, res, next) {
     if(inpvalue == '2'){
       lng='eng';
     }
-    
+
     req.files.forEach((file)=>{
       const imagePath = file.path;
-      // console.log(path.dirname(imagePath));
-      Tesseract.recognize(imagePath, {
+      const p1 = Tesseract.recognize(imagePath, {
         lang: lng,
         oem: 1,
         psm: 3,
@@ -114,18 +118,31 @@ app.post('/converted', upload.array('files'), function(req, res, next) {
         // const textFilePath1=(path.basename(imagePath).slice(0, -path.extname(imagePath).length));
 
         // file.originalname represents the filename as the user uploaded. we're removing extension and just getting basename from imagename.jpg
-        const textFilePath = path.join(textFolder, `${path.basename(file.originalname, path.extname(file.originalname))}.txt`);
-        fs.writeFileSync(textFilePath, text);
+        const createTextFiles_withPath = path.join(textFolder, `${path.basename(file.originalname, path.extname(file.originalname))}.txt`);
+        fs.writeFileSync(createTextFiles_withPath, text);
 
         // deletes all the images after converted to texts at once, so it's just 'unlink' else it would me unlinkSync.
         // promises checks if all the file related tasks are completed. it promises that after the file related tasks are completed then it will unlink the image files.
         fs.promises.unlink(imagePath);
+
+        const textFilesContent = fs.readFileSync(createTextFiles_withPath); // creating zip files for each text files converted from images.
+        zip1.file(path.basename(createTextFiles_withPath), textFilesContent);  // extracting just filename from texts folder & adding all the file contents to zip1 variable
+      
+        zip1.generateAsync({  type: "nodebuffer" }).then((content) => {
+          const zipFileName = `./public/uploads/${userId}/texts/imageToText.zip`;
+  
+          fs.writeFile(zipFileName, content, (err) => {
+            if(err){
+              return
+            }
+            console.log("files are zipped and saved");
+            fs.promises.unlink(createTextFiles_withPath);
+            res.download(zipFileName);
+          })
+        })
       });
-      // fs.unlinkSync(path.dirname(imagePath));
-      // fs.rmdirSync(path.dirname(imagePath));
     })
-    
-    res.redirect('/');
+    // res.redirect('/');
   }
 });
 

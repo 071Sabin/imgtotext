@@ -25,7 +25,7 @@
                 </h1>
                 <br>
                 <ol class="list-decimal">
-                    <li>Convert your pdf to images from this site <a href="https://www.ilovepdf.com/pdf_to_jpg" target="_blank" class="text-green-500">pdf to Image</a> and download zip file.</li>
+                    <li>Convert your pdf to images from this site <a href="https://www.ilovepdf.com/pdf_to_jpg" target="_blank" class="text-green-500 hover:underline">pdf to Image</a> and download zip file.</li>
                     <li>Extract the zip file downloaded.</li>
                     <li><strong>Ctrl+A</strong> to select all the image files.</li>
                     <li>Right click on any file(<em>as all files are selected</em>) and select <strong>rename</strong>.</li>
@@ -35,8 +35,8 @@
                 </ol>
             </div>
 
-            <p class="mt-7 sm:mt-10 bg-blue-300 text-blue-800 px-6 w-fit text-md sm:text-base rounded-md py-2 flex border-2 border-blue-800">&nbsp;
-                <i class="bi bi-info-circle-fill"></i>&nbsp;<strong>NOTE:</strong>&nbsp;The text generated from the images you provide may not be 100% accurate !!
+            <p class="mt-7 sm:mt-10 bg-blue-300 text-blue-800 px-6 w-fit text-md sm:text-md rounded-md py-2 flex border-2 border-blue-800">&nbsp;
+                <i class="bi bi-info-circle-fill"></i>&nbsp;<strong>NOTE:</strong>&nbsp;The text generated may not be 100% accurate from the images you provide !!
             </p>
 
             <div class="border-dashed border-2 border-black-900 mt-3 p-5 lg:flex lg:items-center lg:justify-between">
@@ -44,7 +44,7 @@
                 <form id="form" class="" action="/converted" autocomplete="off" method="POST" enctype="multipart/form-data">  
                     <p class="text-2xl sm:text-3xl font-bold mb-4">Upload Images Here</p>                  
                     <p class="pb-2 text-md sm:text-lg">1. Select the language that appears in your picture.</p>
-                    <select name="language" id="lng" class="text-white mb-4 p-2 rounded-lg bg-gray-600 text-center w-full text-md sm:text-lg" required>
+                    <select name="language" id="lng" class="text-white mb-4 p-2 rounded-lg bg-gray-600 text-center w-full text-md sm:text-md" required>
                         <option value="" disabled selected hidden>-- Choose Language --</option>
                         <option value="1">Nepali</option>
                         <option value="2">English</option>
@@ -52,17 +52,17 @@
                     <br>
                     
                     <% if (errorMessage) {%>
-                        <p id="error1" class="bg-red-300 text-red-900 text-center py-2 mb-4 rounded-md border-2 border-red-800" role="alert"><i class="bi bi-exclamation-triangle-fill">&nbsp;</i><%= errorMessage %></p> 
+                        <p id="error1" class="bg-red-300 text-red-900 text-center py-2 mb-4 rounded-md border-2 border-red-800 text-md sm:text-lg" role="alert"><i class="bi bi-exclamation-triangle-fill">&nbsp;</i><%= errorMessage %></p> 
                     <%}%>
 
-                    <p class="">2. Insert one or more picture files.</p>
-                    <input type="file" name="files" id="fileInput" class="mb-4 w-full border-solid border-2 border-black-600 px-2 py-4 rounded-lg file:rounded-md file:border-0 file:bg-green-500 file:py-2 file:px-3 file:text-white" multiple required><br>
+                    <p class="text-md sm:text-lg">2. Insert one or more picture files.</p>
+                    <input type="file" name="files" id="fileInput" class="mb-4 w-full border-solid border-2 border-black-600 px-2 py-4 rounded-lg file:rounded-md file:border-0 file:bg-green-500 file:py-2 file:px-3 file:text-white file:cursor-pointer file:hover:bg-green-600" multiple required><br>
                     <button id="submitBtn" action="#" class="bg-green-500 w-full text-white px-5 py-2 rounded-md hover:bg-white hover:text-green-600 hover:border-solid hover:border-2 hover:border-green-600 cursor-pointer"><a>SUBMIT</a></button><br>
                 </form>
 
-                <div class="mt-5 sm:mt-0 w-full sm:w-1/2">
-                    <button class="bg-green-500 text-white text-xl w-full sm:w-1/2 py-2 rounded-md hover:bg-white hover:text-green-600 hover:border-solid hover:border-2 hover:border-green-600 cursor-pointer">Download</button>
-                </div>
+                <!-- <div class="mt-5 sm:mt-0 w-full sm:w-1/2">
+                    <button class="bg-green-500 text-white text-md sm:text-lg w-full sm:w-1/2 py-2 rounded-md hover:bg-white hover:text-green-600 hover:border-solid hover:border-2 hover:border-green-600 cursor-pointer">DOWNLOAD</button>
+                </div> -->
 
             </div>
         </main>
@@ -72,5 +72,5 @@
       </footer>
   </body>
 <!-- <script src="https://cdn.tailwindcss.com"></script> -->
-<!-- <script src="/javascripts/index.js"></script> -->
+<!-- <script src="./public/javascripts/FileSaver.js"></script> -->
 </html>
