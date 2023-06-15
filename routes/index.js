@@ -8,8 +8,7 @@ const Tesseract = require('node-tesseract-ocr');
 // const bcrypt = require('bcrypt'); //encyypt and decrypt
 // const { v4: uuidv4 } = require('uuid'); //used to create random texts of 32 places.
 const jsZip = require('jszip');
-const { create } = require('domain');
-
+// var admin = require("firebase-admin");
 
 const app=express();
 app.use(cookieParser());
