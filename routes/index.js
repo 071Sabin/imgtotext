@@ -135,14 +135,13 @@ app.post('/converted', upload.array('files'), function(req, res, next) {
             if(err){
               return
             }
-            console.log("files are zipped and saved");
+            // console.log("files are zipped and saved");
             fs.promises.unlink(createTextFiles_withPath);
             res.download(zipFileName);
           })
         })
       });
     })
-    // res.redirect('/');
   }
 });
 
