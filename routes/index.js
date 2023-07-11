@@ -13,7 +13,7 @@ const jsZip = require('jszip');
 const app=express();
 app.use(cookieParser());
 
-function generateUserId(res){
+function generateUserId(){
   const userRandomId = Math.random().toString(36).substr(2, 9);
   return`user_${userRandomId}`;
 }
@@ -76,7 +76,7 @@ app.get('/', function(req, res, next) {
 });
 
 // write upload.array('input field name', maxcount)
-app.post('/converted', upload.array('files'), function(req, res, next) {
+app.post('/converted', upload.array('files'), function(req, res) {
 
   if (req.fileValidationError) {
     return res.render('index', { title: 'Image To Text', errorMessage: req.fileValidationError});
@@ -86,9 +86,19 @@ app.post('/converted', upload.array('files'), function(req, res, next) {
     const inpvalue = req.body.language;
     const zip1 = new jsZip();
     const userId = req.cookies.userName;
-    zipFolderPath = `${userId}/texts`;
+    var zipFileName = `./public/uploads/${userId}/texts/imageToText.zip`;
+
+    var textCount=0;
+    var uploadCount = 0;
+
+    var textFolder = path.join(`./public/uploads/${userId}`, 'texts');
+    if(!fs.existsSync(textFolder)){
+      fs.mkdirSync(textFolder);
+    }
 
     let lng = "";
+
+
     if(inpvalue === '1'){
       lng='nep';
     }
@@ -98,18 +108,13 @@ app.post('/converted', upload.array('files'), function(req, res, next) {
 
     req.files.forEach((file)=>{
       const imagePath = file.path;
-      const p1 = Tesseract.recognize(imagePath, {
+      Tesseract.recognize(imagePath, {
         lang: lng,
         oem: 1,
         psm: 3,
       })
 
       .then((text)=>{
-        // console.log(text);
-        var textFolder = path.join(path.dirname(file.destination), 'texts');
-        if(!fs.existsSync(textFolder)){
-          fs.mkdirSync(textFolder);
-        }
 
         // 1. seperating file name and extension. And removing the extension .jpg at last or whatever the extensions is.
         //    basically extracting name of the file.
@@ -120,6 +125,13 @@ app.post('/converted', upload.array('files'), function(req, res, next) {
         const createTextFiles_withPath = path.join(textFolder, `${path.basename(file.originalname, path.extname(file.originalname))}.txt`);
         fs.writeFileSync(createTextFiles_withPath, text);
 
+        // textCount increases till all the img files are converted to text.
+        // uploadCount counts the no. of images uploaded
+        // uploadCount wala line paila execute hunxa and then converts to text
+        // so increase uploadCount and let the download appear after uploadCount == textCount
+        textCount++;
+        // console.log(textCount);
+
         // deletes all the images after converted to texts at once, so it's just 'unlink' else it would me unlinkSync.
         // promises checks if all the file related tasks are completed. it promises that after the file related tasks are completed then it will unlink the image files.
         fs.promises.unlink(imagePath);
@@ -128,22 +140,23 @@ app.post('/converted', upload.array('files'), function(req, res, next) {
         zip1.file(path.basename(createTextFiles_withPath), textFilesContent);  // extracting just filename from texts folder & adding all the file contents to zip1 variable
       
         zip1.generateAsync({  type: "nodebuffer" }).then((content) => {
-          const zipFileName = `./public/uploads/${userId}/texts/imageToText.zip`;
+          // const zipFileName = `./public/uploads/${userId}/texts/imageToText.zip`;
   
           fs.writeFile(zipFileName, content, (err) => {
             if(err){
               return
             }
-            // console.log("files are zipped and saved");
             fs.promises.unlink(createTextFiles_withPath);
-            res.download(zipFileName);
-          })
-        })
+            if(textCount == uploadCount){
+              res.download(zipFileName);
+            }
+          });
+        });
       });
-    })
+      // uploadCount is here to count the number of img files uploaded. on the basis of this we compare the textCount and let the user to download the zip file.
+      uploadCount++;
+    });
   }
 });
-
-
 
 module.exports = app;
