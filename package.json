@@ -3,7 +3,11 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www"
+    "start": "node /routes/index.js",
+    "build": "npm run clean && npm run build:css && npm run build:js",
+    "build:css": "node-sass --output-style compressed -o public/css src/scss",
+    "build:js": "browserify src/js/app.js -o public/js/bundle.js",
+    "clean": "rm -rf public"
   },
   "dependencies": {
     "cookie-parser": "~1.4.4",
